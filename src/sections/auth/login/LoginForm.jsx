@@ -20,13 +20,30 @@ import { LoadingButton } from "@mui/lab";
 // components
 import Iconify from "../../../components/iconify";
 
+import API from "../../../util/api";
+import axios from "axios";
+
 export default function LoginForm() {
   const navigate = useNavigate();
 
+  const [idValue, setId] = useState("");
+  const [pwValue, setPw] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleClick = () => {
-    navigate("/dashboard", { replace: true });
+  const handleClick = async () => {
+    // navigate("/dashboard", { replace: true });
+    const res = await API.get("/api/jwt", {
+      params: { loginid: idValue, passwd: pwValue },
+    });
+    console.log(res.data.code);
+    console.log(res.data.token);
+    console.log(res.status);
+
+    if (res.data.code === "ok" && res.status === 200) {
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${res.data.token}`;
+    }
   };
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -35,10 +52,23 @@ export default function LoginForm() {
     event.preventDefault();
   };
 
+  const saveUserId = (event) => {
+    setId(event.target.value);
+  };
+
+  const saveUserPw = (event) => {
+    setPw(event.target.value);
+  };
+
   return (
     <>
       <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+        <TextField
+          name="email"
+          label="Email address"
+          value={idValue}
+          onChange={saveUserId}
+        />
 
         <FormControl sx={{ m: 1 }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">
@@ -46,6 +76,8 @@ export default function LoginForm() {
           </InputLabel>
           <OutlinedInput
             id="outlined-adornment-password"
+            value={pwValue}
+            onChange={saveUserPw}
             type={showPassword ? "text" : "password"}
             endAdornment={
               <InputAdornment position="end">
