@@ -31,7 +31,6 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClick = async () => {
-    // navigate("/dashboard", { replace: true });
     const res = await API.get("/api/jwt", {
       params: { loginid: idValue, passwd: pwValue },
     });
@@ -43,6 +42,7 @@ export default function LoginForm() {
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${res.data.token}`;
+      navigate("/todo", { replace: true });
     }
   };
 
